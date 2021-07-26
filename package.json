@@ -1,0 +1,27 @@
+{
+    "name": "convbot-fastapi",
+    "version": "0.1.0",
+    "description": "description",
+    "main": "index.js",
+    "repository": "git@github.com:ffreemt/convbot-fastapi.git",
+    "author": "ffreemt",
+    "license": "MIT",
+    "dependencies": {
+        "npm-run-all": "^4.1.5"
+    },
+    "scripts": {
+        "start": "pyright && pytest && yarn style",
+        "test": "nodemon -w tests -w convbot_fastapi -x pytest tests",
+        "pyright": "nodemon -w convbot_fastapi -w .venv -e .py -x pyright convbot_fastapi tests",
+        "pytest": "nodemon -w tests -w convbot_fastapi -e .py -x pytest tests convbot_fastapi",
+        "style": "nodemon -w convbot_fastapi -w tests -x \"black tests convbot_fastapi && python -m flake8\"",
+        "docstyle": "nodemon -w convbot_fastapi -w tests -x pydocstyle --convention=google tests convbot_fastapi",
+        "pylint": "nodemon -w convbot_fastapi -e .py -x pylint convbot_fastapi",
+        "test:convbot_fastapi": "nodemon -w tests -e .py -x pytest -k convbot_fastapi tests",
+        "publish": "poetry build && poetry publish",
+        "black": "black tests convbot_fastapi",
+        "flake8": "flake8 tests convbot_fastapi",
+        "pep257": "pep257 tests convbot_fastapi",
+        "final": "run-s pep257 black flake8 pytest"
+    }
+}
