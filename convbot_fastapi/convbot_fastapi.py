@@ -77,12 +77,12 @@ async def post_text(q: Text):
 
 
 @memory.cache(verbose=False)
-@force_async
 def encode(text):
     """Encode sents."""
     return tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
 
 
+@force_async
 def _convbot(
     sent: str,
     prev_resp: str = "",
