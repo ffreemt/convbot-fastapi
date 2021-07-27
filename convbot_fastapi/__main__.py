@@ -13,7 +13,7 @@ import uvicorn
 from logzero import logger
 
 
-def run_uvicorn(host="127.0.0.1", port=8000, debug=False, reload=False):
+def run_uvicorn(host="0.0.0.0", port=8000, debug=False, reload=False):
     uvicorn.run(
         app="convbot_fastapi.convbot_fastapi:app",
         host=host,
