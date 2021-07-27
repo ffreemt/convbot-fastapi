@@ -10,7 +10,7 @@ ENV VIRTUAL_ENV=/convbot-fastapi/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY . .
-RUN python3 -m pip install poetry && poetry config virtualenvs.create yes && poetry config virtualenvs.in-project true
+RUN python3 -m pip install poetry && poetry config virtualenvs.create true && poetry config virtualenvs.in-project true
 
 RUN poetry install --no-root --no-dev
 
