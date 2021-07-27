@@ -1,0 +1,31 @@
+# Stage 1
+# FROM python:3-slim-buster AS builder
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8 as builder
+
+WORKDIR /convbot-fastapi
+
+# RUN python3 -m venv venv
+
+ENV VIRTUAL_ENV=/convbot-fastapi/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+COPY . .
+RUN python3 -m pip install poetry && poetry config virtualenvs.create yes && poetry config virtualenvs.in-project true
+
+RUN poetry install --no-root --no-dev
+
+# Stage 2
+# FROM python:3-slim-buster AS runner
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8 as runner
+
+WORKDIR /convbot-fastapi
+
+EXPOSE 8000
+
+COPY --from=builder /convbot-fastapi/.venv .venv
+COPY . .
+
+ENV VIRTUAL_ENV=/convbot-fastapi/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+CMD python3 -m convbot_fastapi
