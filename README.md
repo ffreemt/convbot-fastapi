@@ -17,7 +17,23 @@ pip install convbot-fastapi -U
 ```
 
 ## Use it
-```python
-from convbot_fastapi import convbot_fastapi
-
+```bash
+python -m convbot_fastapi
 ```
+Point your browser to `httpL//127.0.0.1:8000/docs`
+
+Or with uvicorn
+```bash
+uvicorn convbot_fastapi.convbot_fastapi:app
+```
+
+## Deploy it to the cloud
+Clone the repo
+```bash
+git clone https://github.com/ffreemt/convbot-fastapi
+cd convbot-fastapi
+```
+
+Create a docker image from `Dockerfile` and upload it to `https://hub.docker.com/`
+
+Sign up and deploy the docker image to, for example, `koyeb.com`.

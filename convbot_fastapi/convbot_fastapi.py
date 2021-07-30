@@ -42,8 +42,8 @@ def convbot_fastapi():
 class Text(BaseModel):
     """Define post format."""
 
-    text: str
-    prev_resp: str = ""
+    text: Optional[str]
+    prev_resp: Optional[str] = ""
     max_length: int = 1000
     do_sample: bool = True
     top_p: float = 0.95
@@ -53,9 +53,9 @@ class Text(BaseModel):
 
 
 @app.get("/")
-async def landing(q: Text) -> str:
+async def landing(q: str = "") -> str:
     """Feed a landing message."""
-    return "convbot-fastapi docs at http://convbot-yucongo.koyeb.app/docs"""
+    return "convbot-fastapi docs at http://convbot-yucongo.koyeb.app/docs" ""
 
 
 @app.post("/text/")
@@ -87,8 +87,9 @@ async def post_text(q: Text) -> dict:
     # url = "api_address"  # e.g. url = "http://convbot.ttw.workers.dev/text"
 
     url = "http://convbot-yucongo.koyeb.app/text"
+    url = "http://acone3:8000"
     data = {"text": message, "prev_resp": ""}
-    res = requests.post(url, json=data)
+    res = requests.post(f"{url}/text", json=data)
     reply = res.json().get("result").get("resp")
     print(reply)
     # 'Good, you?' or something
@@ -97,7 +98,7 @@ async def post_text(q: Text) -> dict:
     prev_resp = "I am fine."
     message1 = "What's your name?"
     data = {"text": message1, "prev_resp": prev_resp}
-    res = requests.post(url, json=data)
+    res = requests.post(f"{url}/text", json=data)
     reply1 = res.json().get("result").get("resp")
 
     # wrap reuests.post in `try:... except...` as desired
@@ -118,15 +119,17 @@ async def post_text(q: Text) -> dict:
     ```python
     import requests
     url = "..."  # plug in a valid address
+    url = "http://convbot-yucongo.koyeb.app"
+    url = "http://acone3:8000"
 
     prev_resp = ""
-    print("Bot: talk to me")
+    print("Bot: talk to me (to exit, type quit)")
     while 1:
         user_msg = input("User: ")
         if user_msg.lower() in ["quit", "exit"]:
             print("bye...")
             break
-        r = requests.post(url, json={"text": user_msg, "prev_resp": prev_resp})
+        r = requests.post(f"{url}/text", json={"text": user_msg, "prev_resp": prev_resp})
         resp = r.json().get("result").get("result")
         print("Bot: ", resp)
         prev_resp = resp
@@ -143,6 +146,10 @@ async def post_text(q: Text) -> dict:
 
     # _ = sent_corr(text1, text2)
     # _ = await deepl_tr(text, from_lang, to_lang, page=PAGE,)
+    if text is None:
+        text = ""
+    if prev_resp is None:
+        prev_resp = ""
     try:
         _ = await _convbot(
             text, prev_resp, max_length, do_sample, top_p, top_k, temperature,
@@ -150,7 +157,7 @@ async def post_text(q: Text) -> dict:
         _ = {"resp": _}
     except Exception as exc:
         logger.error(exc)
-        _ = {"error": True, "message": str(exc)}
+        _ = {"resp": "", "error": True, "message": str(exc)}
 
     return {"q": q, "result": _}
 
@@ -159,7 +166,7 @@ async def post_text(q: Text) -> dict:
 async def get_text(
     # https://fastapi.tiangolo.com/tutorial/query-params/
     msg: Optional[str] = Query(
-        "",  # default empty str
+        ...,
         max_length=1500,
         min_length=2,  # disallow one character message
         title="user's message",
@@ -186,23 +193,11 @@ async def get_text(
 
     msg = "How are you?"
     url = "http://convbot-yucongo.koyeb.app"
-    res = requests.get(f"{url}/?q={msg}")
-    reply = res.json.get("result").get("reply")
+    url = "http://acone3:8000"
+    res = requests.get(f"{url}/text/?msg={msg}")
+    reply = res.json().get("result").get("resp")
     print(reply)
     # 'I am good' or the like
-
-    ```
-
-    """
-    """Get text.
-
-    ```python
-    import requests
-    url = "http://convbot-yucongo.koyeb.app/text"
-    msg = "How are you?"
-    res = requests.get(f"{url}/?q={msg{}"
-    print(res.json.get("result").get("resp"))
-    # I am fine or similiar
     ```
     """
     logger.debug("text: %s", msg)
@@ -237,6 +232,8 @@ async def get_text(
         logger.error(exc)
         _ = {"error": True, "message": str(exc)}
 
+    logger.debug("return: %s", q)
+
     return {"q": q, "result": _}
 
 
@@ -248,8 +245,8 @@ def encode(text):
 
 @force_async
 def _convbot(
-    sent: str,
-    prev_resp: str = "",
+    sent: Optional[str],
+    prev_resp: Optional[str] = "",
     max_length: int = 1000,
     do_sample: bool = True,
     top_p: float = 0.95,
@@ -258,9 +255,11 @@ def _convbot(
 ):
     """Generate a response."""
     # sent_ids = tokenizer.encode(sent + tokenizer.eos_token, return_tensors="pt")
+    if sent is None:
+        sent = ""
     sent_ids = encode(sent)
 
-    if not prev_resp.strip():
+    if not prev_resp or not prev_resp.strip():
         # prev_resp_ids = tokenizer.encode(prev_resp + tokenizer.eos_token, return_tensors="pt")
         prev_resp_ids = encode(prev_resp)
         bot_input_ids = torch.cat([prev_resp_ids, sent_ids], dim=-1)
