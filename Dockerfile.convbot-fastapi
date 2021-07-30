@@ -23,9 +23,9 @@ WORKDIR /convbot-fastapi
 EXPOSE 8000
 
 COPY --from=builder /convbot-fastapi/.venv .venv
-COPY . .
+COPY . ./
 
 ENV VIRTUAL_ENV=/convbot-fastapi/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-CMD python3 -m convbot_fastapi
+CMD python -m convbot_fastapi

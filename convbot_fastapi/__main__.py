@@ -1,4 +1,4 @@
-"""Run __main__."
+"""Run __main__.
 
 org deepl-fastapi
 Run uvicorn with deepl_fastapi.deepl_server:app.
@@ -14,6 +14,7 @@ from logzero import logger
 
 
 def run_uvicorn(host="0.0.0.0", port=8000, debug=False, reload=False):
+    """Config nd run uvicron."""
     uvicorn.run(
         app="convbot_fastapi.convbot_fastapi:app",
         host=host,
@@ -27,6 +28,7 @@ def run_uvicorn(host="0.0.0.0", port=8000, debug=False, reload=False):
 
 
 def main():
+    """Define main."""
     # signal(SIGINT, SIG_DFL)
     # print("ctrl-C to interrupt")
 
